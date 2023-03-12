@@ -1,0 +1,5 @@
+image_name: "ansible-terraform-runner"
+image_version: "latest"
+docker_registry: "localhost:5000"
+registry_username: "{{ lookup('env', 'REGISTRY_USERNAME') }}"
+registry_password: "{{ lookup('env', 'REGISTRY_PASSWORD') }}"

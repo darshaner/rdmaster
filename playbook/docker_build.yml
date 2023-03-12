@@ -1,0 +1,40 @@
+- hosts: all 
+  become: yes
+  gather_facts: no
+  tasks:
+
+    - name: Copy build files
+      copy:
+        src: ../dockerfiles/{{ image_name }}/{{ item }}
+        dest: /tmp/build/
+      with_items: 
+        - Dockerfile
+        - requirements.txt
+      delegate_to: localhost
+
+    - name: Build Docker image
+      docker_image: 
+        name: "{{ image_name }}"
+        build:
+          path: "/tmp/build/{{ image_name }}/"
+          dockerfile: "/tmp/build/{{ image_name }}/Dockerfile"
+        tag: "{{ image_version }}"
+        state: present
+        source: build
+      register: docker_image_result
+
+    - name: Push Docker image
+      docker_login:
+        registry_url: http://{{ docker_registry }}/
+        username: "{{ registry_username }}"
+        password: "{{ registry_password }}"
+      when: docker_image_result is changed
+
+    - name: Push Docker image
+      docker_image:
+        name: "{{ image_name }}"
+        tag: "{{ image_version }}"
+        repository: "{{ docker_registry }}/{{ image_name }}"
+        push: true
+        source: local
+      when: docker_image_result is changed
