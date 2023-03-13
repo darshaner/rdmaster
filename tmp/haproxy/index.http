@@ -1,0 +1,26 @@
+HTTP/1.0 200 Found
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<title> RDPROD Home Page </title>
+<meta charset="UTF-8">
+</head>
+
+<body>
+<p><a href="http://uptime.rdprod.org">Uptime</a></p>
+<p><a href="http://homebridge.rdprod.org">HomeBridge</a></p>
+<p><a href="http://grafana.rdprod.org">Grafana</a></p>
+<p><a href="http://kibana.rdprod.org">Kibana</a></p>
+<p><a href="http://plex.rdprod.org">Plex</a></p>
+<p><a href="http://transmission.rdprod.org">Transmission</a></p>
+<p><a href="http://archer.rdprod.org">Archer</a></p>
+<p><a href="http://freebox.rdprod.org">Freebox</a></p>
+<p><a href="http://registry-ui.rdprod.org">Docker Registry</a></p>
+
+</body> 
+</html>
