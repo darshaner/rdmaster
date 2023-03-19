@@ -12,15 +12,15 @@ Content-Type: text/html
 </head>
 
 <body>
-<p><a href="http://uptime.rdprod.org">Uptime</a></p>
+{% for container in container_info.results %}
+  {% set container_name = container.container.Name | regex_replace('^/', '') %}
+
+<p><a href="http://{{ container_name}}.rdprod.org">{{ container_name }}</a></p>
+{% endfor %}
 <p><a href="http://homebridge.rdprod.org">HomeBridge</a></p>
-<p><a href="http://grafana.rdprod.org">Grafana</a></p>
-<p><a href="http://kibana.rdprod.org">Kibana</a></p>
 <p><a href="http://plex.rdprod.org">Plex</a></p>
 <p><a href="http://transmission.rdprod.org">Transmission</a></p>
-<p><a href="http://archer.rdprod.org">Archer</a></p>
 <p><a href="http://freebox.rdprod.org">Freebox</a></p>
-<p><a href="http://registry-ui.rdprod.org">Docker Registry</a></p>
 
 </body> 
 </html>

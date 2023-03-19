@@ -151,29 +151,29 @@ services:
     ports:
       - "5601:5601"
 
-        #### Homebridge
-        #  homebridge:
-        #    container_name: homebridge
-        #    image: oznu/homebridge:latest
-        #    restart: always
-        #    logging:
-        #      driver: json-file
-        #      options:
-        #        max-size: "10mb"
-        #        max-file: "7"
-        #    volumes:
-        #      - /var/lib/homebridge:/homebridge:rw
-        #    networks:
-        #      - elastic
-        #    ports:
-        #      - "8581:8581"
-        #      - "34164:34164"
-        #      - "42585:42585"
-        #      - "53908:53908"
-        #    expose:
-        #      - "34164/tcp"
-        #      - "42585/tcp"
-        #      - "53908/tcp"
+### Homebridge
+#  homebridge:
+#    container_name: homebridge
+#    image: oznu/homebridge:latest
+#    restart: always
+#    logging:
+#      driver: json-file
+#      options:
+#        max-size: "10mb"
+#        max-file: "7"
+#    volumes:
+#      - /var/lib/homebridge:/homebridge:rw
+#    networks:
+#      - elastic
+#    ports:
+#      - "8581:8581"
+#      - "34164:34164"
+#      - "42585:42585"
+#      - "53908:53908"
+#    expose:
+#      - "34164/tcp"
+#      - "42585/tcp"
+#      - "53908/tcp"
 
 ### Transmission
 #    transmission:

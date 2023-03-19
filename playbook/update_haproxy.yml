@@ -1,0 +1,9 @@
+---
+- name: update HAProxy Config and Cloudflare
+  hosts: docker_host
+  become: yes
+  gather_facts: no
+  roles:
+    - ../roles/dyn_haproxy
+
+...  
