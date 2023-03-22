@@ -48,7 +48,7 @@
     record: "{{ item.container.Name | regex_replace('^/', '') }}.rdprod.org"
     type: "A"
     value: "82.66.158.76"
-    ttl: 300
+    ttl: 60
     proxied: no
     state: "present"
     api_token: "SiRgv-1dGhN3DiB-10b2Id4CUiYJjpdassoQBtEA"
@@ -61,7 +61,7 @@
     record: "{{ item }}.rdprod.org"
     type: "A"
     value: "82.66.158.76"
-    ttl: 300
+    ttl: 60
     proxied: no
     state: "present"
     api_token: "SiRgv-1dGhN3DiB-10b2Id4CUiYJjpdassoQBtEA"

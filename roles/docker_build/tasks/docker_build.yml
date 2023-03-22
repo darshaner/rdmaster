@@ -1,25 +1,57 @@
 ---
+- name: Create directory using command module
+  ansible.builtin.command:
+    cmd: mkdir -p {{ build_dir }}/{{ image_name }}
+  args:
+    creates: "{{ build_dir }}/{{ image_name }}"
+  become: true
+
 - name: Copy build files
   copy:
     src: ../dockerfiles/{{ image_name }}/{{ item }}
-    dest: /tmp/build/
+    dest: "{{ build_dir }}/{{ image_name}}/"
   with_items: 
     - Dockerfile
     - requirements.txt
-  delegate_to: localhost
+  become: true
+
+- name: Prune unused Docker images
+  community.docker.docker_prune:
+    images: yes
+    containers: no
+    volumes: no
+    networks: no
+    images_filters:
+      dangling: false
+      until: "0m"
+  become: true
 
 - name: Build Docker image
   docker_image: 
     name: "{{ image_name }}"
     build:
-      path: "/tmp/build/{{ image_name }}/"
-      dockerfile: "/tmp/build/{{ image_name }}/Dockerfile"
+      path: "{{ build_dir }}/{{ image_name }}/"
+      dockerfile: "{{ build_dir }}/{{ image_name }}/Dockerfile"
     tag: "{{ image_version }}"
     state: present
     source: build
-  register: docker_image_result
+  register: docker_image_result 
 
-- name: Push Docker image
+- name: Tag Docker image with Version
+  ansible.builtin.command:
+    cmd: docker tag {{ image_name }}:{{ image_version }} {{ docker_registry }}/{{ image_name }}:{{ image_version }}
+  become: true
+
+- name: Wait for registry API to become available
+  ansible.builtin.uri:
+    url: http://{{ docker_registry }}/
+    status_code: 200
+  register: registry_result
+  until: registry_result.status == 200
+  retries: 10
+  delay: 30
+
+- name: Login to local registry
   docker_login:
     registry_url: http://{{ docker_registry }}/
     username: "{{ registry_username }}"
@@ -34,5 +66,22 @@
     push: true
     source: local
   when: docker_image_result is changed
+
+- name: Prune unused Docker images
+  community.docker.docker_prune:
+    images: yes
+    containers: no
+    volumes: no
+    networks: no
+    images_filters:
+      dangling: false
+      until: "0m"
+  become: true
+
+- name: Delete directory
+  ansible.builtin.file:
+    path: "{{ build_dir }}/{{ image_name }}"
+    state: absent
+  become: true
 
 ...
