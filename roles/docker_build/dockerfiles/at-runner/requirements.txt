@@ -1,0 +1,15 @@
+ansible
+ansible-core
+argcomplete
+cffi
+cryptography
+Jinja2
+MarkupSafe
+packaging
+pip
+pycparser
+PyYAML
+resolvelib
+setuptools
+six
+wheel
