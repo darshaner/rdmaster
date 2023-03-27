@@ -1,0 +1,68 @@
+folder: "opt"
+cf_token: "SiRgv-1dGhN3DiB-10b2Id4CUiYJjpdassoQBtEA"
+cf_zone: "rdprod.org"
+cf_ttl: "60"
+public_ip: "82.66.158.76"
+haproxy_folder: "/etc/haproxy"
+docker_registry_host:
+  app: "registry"
+  services:
+    registry:
+      container_name: registry
+      image: registry:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.61"
+      ports:
+        - "5000:5000"
+      expose:
+        - "5000"
+      environment:
+        REGISTRY_STORAGE_DELETE_ENABLED: "'true'"
+        REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
+        REGISTRY_HTTP_SECRET: "05Darsh@ne"
+        REGISTRY_AUTH: htpasswd
+        REGISTRY_AUTH_HTPASSWD_REALM: Registry
+        REGISTRY_AUTH_HTPASSWD_PATH: /auth/registry.password
+      volumes:
+        - ./registry/auth:/auth:rw
+        - ./registry/data:/data:rw
+        - ./registry/config.yml:/etc/docker/registry/config.yml:rw
+      proxied: false
+  
+    registry-ui:
+      container_name: registry-ui
+      image: joxit/docker-registry-ui:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.62"
+      ports:
+        - "80:80"
+      expose:
+        - "80"
+      environment:
+        - REGISTRY_URL=http://registry.rdprod.org:5000
+        - DELETE_IMAGES=true
+        - SINGLE_REGISTRY=true
+      proxied: true
+      depends_on:
+        - registry
+  
+  networks:
+    elastic: 
+      driver: macvlan
+      driver_opts: 
+        parent: enp5s0
+      ipam:
+        config:
+          - subnet: 192.168.0.0/24
+            gateway: 192.168.0.254
+  volumes:
+    registry:
+      driver: local

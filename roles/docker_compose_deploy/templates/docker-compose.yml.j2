@@ -4,6 +4,7 @@ services:
 {% for service_name, service_config in services.items() %}
   {{ service_name }}:
 {% for key, value in service_config.items() %}
+{% if key != 'proxied' %}
 {% if value is mapping %}
     {{ key }}:
 {% for sub_key, sub_value in value.items() %}
@@ -18,6 +19,7 @@ services:
 {% endfor %}
 {% else %}
     {{ key }}: {{ value }}
+{% endif %}
 {% endif %}
 {% endfor %}
 {% endfor %}

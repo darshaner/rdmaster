@@ -1,0 +1,247 @@
+
+folder: "opt"
+cf_token: "SiRgv-1dGhN3DiB-10b2Id4CUiYJjpdassoQBtEA"
+cf_zone: "rdprod.org"
+cf_ttl: "60"
+public_ip: "82.66.158.76"
+haproxy_folder: "/etc/haproxy"
+docker_host_runner:
+  app: "rdprod-services"
+  static_cf_services:
+    rdmaster:
+      proxied: false
+    rf:
+      proxied: false
+    rdswitch:
+      proxied: false
+    freebox:
+      proxied: true
+    home:
+      proxied: true
+    plex:
+      proxied: true
+    transmission:
+      proxied: true
+  services:
+    uptime:
+      container_name: uptime
+      image: louislam/uptime-kuma:beta
+      restart: always
+      mem_limit: 1024m
+      mem_reservation: 256M
+      cpus: 0.5
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.63"
+      ports:
+        - "3001:3001"
+      expose:
+        - "3001"
+      volumes:
+        - ./uptime-kuma:/app/data:rw
+      depends_on: 
+        - kibana
+      proxied: true
+
+    grafana:
+      container_name: grafana
+      image: grafana/grafana:latest
+      restart: always
+      mem_limit: 512m
+      mem_reservation: 256M
+      cpus: 0.5
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.68"
+      ports:
+        - "3000:3000"
+      expose:
+        - "3000"
+      #environment:
+      volumes:
+        - ./grafdata/grafana:/usr/share/grafana:rw
+      depends_on:
+        - es
+      proxied: true
+
+    es:
+      container_name: es
+      image: elasticsearch:8.6.2
+      restart: always
+      mem_limit: 1024m
+      mem_reservation: 256M
+      cpus: 1
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.65"
+      ports:
+        - "9200:9200"
+      expose:
+        - "9200"
+      healthcheck:
+        test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+        interval: 30s
+        timeout: 30s
+        retries: 3
+      environment:
+        - cluster.name=es-rajabaly
+        - xpack.security.enabled=false
+        - xpack.license.self_generated.type=basic
+        - "discovery.type=single-node"
+        - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+        - bootstrap.memory_lock=true
+      volumes:
+        - ./esdata/elasticsearch/:/usr/share/elasticsearch/:rw
+      proxied: false
+
+    kibana:
+      container_name: kibana
+      image: kibana:8.6.2
+      restart: always
+      mem_limit: 1024m
+      mem_reservation: 256M
+      cpus: 0.5
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.66"
+      ports:
+        - "5601:5601"
+      expose:
+        - "5601"
+      environment:
+        - ELASTICSEARCH_HOSTS=http://es:9200
+      volumes:
+        - ./kbdata:/usr/share/kibana/data:rw
+      depends_on:
+        - es
+      proxied: true
+
+    homebridge:
+      container_name: homebridge
+      image: oznu/homebridge:latest
+      restart: always
+      mem_limit: 1024m
+      mem_reservation: 256M
+      cpus: 0.5
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.67"
+      ports:
+        - "8581:8581"
+      expose:
+        - "8581"
+      volumes:
+        - ./homebridge/var/lib/homebridge:/homebridge:rw
+      proxied: true
+
+    afp:
+      container_name: afp
+      image: mushanyoung/netatalk:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: 192.168.0.80
+      ports: 
+        - "548:548"
+      expose:
+        - "548"
+      environment: ['USER=darshaner','PASSWORD=05Darsh@ne']
+      volumes: ['./afp/afp.conf:/conf/afp.conf', '/data:/data:rw', '/data-ssd:/data-ssd:rw', '/data-ssd2:/data-ssd2:rw', '/timemachine:/timemachine:rw']
+      proxied: false
+
+  networks:
+    elastic: 
+      driver: macvlan
+      driver_opts: 
+        parent: enp5s0
+      ipam:
+        config:
+          - subnet: 192.168.0.0/24
+            gateway: 192.168.0.254
+
+  volumes:
+    kbdata:
+      driver: local
+    uptime-kuma:
+      driver: local
+    esdata:
+      driver: local
+    vaultdata:
+      driver: local
+
+
+### Transmission
+#    transmission:
+#      image: lscr.io/linuxserver/transmission:latest
+#      container_name: transmission
+#      environment:
+#        - PUID=1000
+#        - PGID=1000
+#        - TZ=Etc/UTC
+#        - TRANSMISSION_WEB_HOME= #optional
+#        - USER= #optional
+#        - PASS= #optional
+#        - WHITELIST= #optional
+#        - PEERPORT= #optional
+#        - HOST_WHITELIST= #optional
+#      volumes:
+#        - /path/to/data:/config
+#        - /path/to/downloads:/downloads
+#        - /path/to/watch/folder:/watch
+#      ports:
+#        - 9091:9091
+#        - 51413:51413
+#        - 51413:51413/udp
+#      restart: unless-stopped
+
+  #  vault:
+  #    container_name: vault
+  #    image: vault:latest
+  #    restart: always
+  #    logging:
+  #      driver: json-file
+  #    networks:
+  #      elastic:
+  #        ipv4_address: 192.168.0.8
+  #    ports: 
+  #      - "8200:8200"
+  #    expose:
+  #      - "8200"
+  #    environment:
+  #      #- VAULT_DEV_ROOT_TOKEN_ID='05Darsh@ne'
+  #      - VAULT_CLUSTER_ADDR='http://vault.rdprod.org:8200'
+  #      - VAULT_API_ADDR='http://vault.rdprod.org/v1'
+  #    volumes: 
+  #      - ./vaultdata:/vault:rw
+  #    cap_add:
+  #      - IPC_LOCK
+  #    command: server 
+
+
+  #  at-runner:
+  #    container_name: at-runner
+  #    image: at-runner:latest
+  #    restart: always
+  #    logging:
+  #      driver: json-file
+  #    networks:
+  #      elastic:
+  #        ipv4_address: "192.168.0.69"
+  #    ports:
+  #      - "22:22"
+  #    expose:
+  #      - "22"
+  #    volumes:
+  #      - ./homebridge/var/lib/homebridge:/homebridge:rw

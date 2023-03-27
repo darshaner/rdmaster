@@ -51,9 +51,6 @@ defaults
 frontend http-in
   bind :8080
 
-##### route to homebridge docker ####
-  acl homebridge hdr(host) -i homebridge.rdprod.org
-  use_backend homebridge-rdmaster-bck if homebridge
 #### route to freebox admin ####
   acl freebox-admin hdr(host) -i freebox.rdprod.org
   use_backend freebox-admin-bck if freebox-admin
@@ -81,9 +78,6 @@ frontend http-in
 backend {{ container_name }}-rdmaster-bck
   server {{ container_name }} {{ ip_address }}:{{ port }}
 {% endfor %}
-
-backend homebridge-rdmaster-bck
-  server rdmaster 192.168.0.53:8581
 
 backend freebox-admin-bck
   server freebox 192.168.0.254:80

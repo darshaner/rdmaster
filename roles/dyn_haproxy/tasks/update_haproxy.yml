@@ -16,13 +16,13 @@
 - name: Generate index.http
   template:
     src: index.http.j2
-    dest: /etc/haproxy/index.http
+    dest: "{{ haproxy_folder }}/index.http"
   register: index_http_result
   delegate_to: haproxy.local
 
 - name: Backup Haproxy Config
   ansible.builtin.command:
-    cmd: cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.backup
+    cmd: cp {{ haproxy_folder }}/haproxy.cfg {{ haproxy_folder }}/haproxy.cfg.backup
   register: haproxy_backup_result
   #when: index_http_result.changed
   delegate_to: haproxy.local
@@ -30,9 +30,9 @@
 - name: Generate haproxy.conf
   template:
     src: haproxy.conf.j2
-    dest: /etc/haproxy/haproxy.cfg
+    dest: "{{ haproxy_folder }}/haproxy.cfg"
   register: haproxy_config_result
-  when: haproxy_backup_result.changed
+  #when: haproxy_backup_result.changed
   delegate_to: haproxy.local
 
 - name: Restart service Haproxy
@@ -42,37 +42,9 @@
   when: haproxy_config_result.changed
   delegate_to: haproxy.local
 
-- name: Add Docker-Services in Cloudflare
-  community.general.cloudflare_dns:
-    zone: "rdprod.org"
-    record: "{{ item.container.Name | regex_replace('^/', '') }}.rdprod.org"
-    type: "A"
-    value: "82.66.158.76"
-    ttl: 60
-    proxied: no
-    state: "present"
-    api_token: "SiRgv-1dGhN3DiB-10b2Id4CUiYJjpdassoQBtEA"
-  when: index_http_result.changed
-  loop: "{{ container_info.results }}"
-
-- name: Add Other Services in Cloudflare
-  community.general.cloudflare_dns:
-    zone: "rdprod.org"
-    record: "{{ item }}.rdprod.org"
-    type: "A"
-    value: "82.66.158.76"
-    ttl: 60
-    proxied: no
-    state: "present"
-    api_token: "SiRgv-1dGhN3DiB-10b2Id4CUiYJjpdassoQBtEA"
-  loop:
-    - rdmaster
-    - freebox
-    - rf
-    - home
-    - plex
-    - homebridge
-    - rdswitch
-    - transmission
+- name: Display docker names
+  debug: 
+    msg: "http://{{ item.key }}.rdprod.org:{{ item.value.expose }}/"
+  loop: "{{ services | dict2items }}"
 
 ...
