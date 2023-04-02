@@ -15,6 +15,7 @@ docker_registry_host:
   services:
     registry:
       container_name: registry
+      hostname: registry
       image: registry:latest
       restart: always
       logging:
@@ -41,6 +42,7 @@ docker_registry_host:
   
     registry-ui:
       container_name: registry-ui
+      hostname: registry-ui
       image: joxit/docker-registry-ui:latest
       restart: always
       logging:

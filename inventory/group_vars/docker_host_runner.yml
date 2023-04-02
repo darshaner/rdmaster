@@ -16,6 +16,7 @@ docker_host_runner:
 ### Production Containers
     afp:
       container_name: afp
+      hostname: afp
       image: mushanyoung/netatalk:latest
       restart: always
       logging:
@@ -33,6 +34,7 @@ docker_host_runner:
 
     homebridge:
       container_name: homebridge
+      hostname: homebridge
       image: oznu/homebridge:latest
       restart: always
       mem_limit: 1024m
@@ -53,6 +55,7 @@ docker_host_runner:
 
     uptime:
       container_name: uptime
+      hostname: uptime
       image: louislam/uptime-kuma:beta
       restart: always
       mem_limit: 1024m
@@ -75,6 +78,7 @@ docker_host_runner:
 
     plex:
       container_name: plex
+      hostname: plex
       image: lscr.io/linuxserver/plex:latest
       restart: always
       logging:
@@ -99,6 +103,7 @@ docker_host_runner:
 
     transmission:
       container_name: transmission
+      hostname: transmission
       image: lscr.io/linuxserver/transmission:latest
       restart: always
       logging:
@@ -128,6 +133,7 @@ docker_host_runner:
 ### Lab Containers
     grafana:
       container_name: grafana
+      hostname: grafana
       image: grafana/grafana:latest
       restart: always
       mem_limit: 512m
@@ -151,6 +157,7 @@ docker_host_runner:
 
     es:
       container_name: es
+      hostname: es
       image: elasticsearch:8.6.2
       restart: always
       mem_limit: 1024m
@@ -183,6 +190,7 @@ docker_host_runner:
 
     kibana:
       container_name: kibana
+      hostname: kibana
       image: kibana:8.6.2
       restart: always
       mem_limit: 1024m
@@ -207,6 +215,7 @@ docker_host_runner:
 
     homeassistant:
       container_name: homeassistant
+      hostname: homeassistant
       image: "ghcr.io/home-assistant/home-assistant:stable"
       restart: always
       logging:
@@ -222,10 +231,11 @@ docker_host_runner:
         - ./homeassist/:/config:rw
         - /etc/localtime:/etc/localtime:ro
       privileged: true
-      proxied: true
+      proxied: false
 
     gitlab:
       container_name: gitlab
+      hostname: gitlab
       image: gitlab/gitlab-ce:latest
       restart: always
       logging:
