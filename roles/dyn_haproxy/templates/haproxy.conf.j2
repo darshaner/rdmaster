@@ -54,12 +54,6 @@ frontend http-in
 #### route to freebox admin ####
   acl freebox-admin hdr(host) -i freebox.rdprod.org
   use_backend freebox-admin-bck if freebox-admin
-#### route to plex ####
-  acl plex hdr(host) -i plex.rdprod.org
-  use_backend plex-bck if plex
-#### route to transmission ####
-  acl transmission hdr(host) -i transmission.rdprod.org
-  use_backend transmission-bck if transmission
 
 {% for container in container_info.results %}
   {% set container_name = container.container.Name | regex_replace('^/', '') %}
@@ -81,12 +75,6 @@ backend {{ container_name }}-rdmaster-bck
 
 backend freebox-admin-bck
   server freebox 192.168.0.254:80
-
-backend plex-bck
-  server plex 192.168.0.13:32400
-
-backend transmission-bck
-  server tranmission 192.168.0.13:9091
 
 backend default_backend
   mode http
