@@ -19,10 +19,6 @@ docker_host_runner:
       proxied: true
     home:
       proxied: true
-    plex:
-      proxied: true
-    transmission:
-      proxied: true
   services:
     uptime:
       container_name: uptime
@@ -203,6 +199,30 @@ docker_host_runner:
         - ./homeassist/:/config:rw
         - /etc/localtime:/etc/localtime:ro
       privileged: true
+      proxied: true
+
+    plex:
+      container_name: plex
+      image: lscr.io/linuxserver/plex:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: 192.168.0.128
+      ports:
+        - "32400:32400"
+      expose:
+        - "32400"
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Etc/UTC
+        - VERSION=docker
+      volumes:
+        - ./plexdata/config:/config
+        - ./../data/Videos/TV Shows:/tv
+        - ./../data/Videos/Movies:/movies
       proxied: true
 
   networks:
