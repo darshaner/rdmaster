@@ -13,6 +13,44 @@ docker_host_runner:
     home:
       proxied: true
   services:
+### Production Containers
+    afp:
+      container_name: afp
+      image: mushanyoung/netatalk:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.100"
+      ports: 
+        - "548:548"
+      expose:
+        - "548"
+      environment: ['USER=darshaner','PASSWORD=05Darsh@ne']
+      volumes: ['./afp/afp.conf:/conf/afp.conf', '/data:/data:rw', '/data-ssd:/data-ssd:rw', '/data-ssd2:/data-ssd2:rw', '/timemachine:/timemachine:rw']
+      proxied: false
+
+    homebridge:
+      container_name: homebridge
+      image: oznu/homebridge:latest
+      restart: always
+      mem_limit: 1024m
+      mem_reservation: 256M
+      cpus: 0.5
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.101"
+      ports:
+        - "8581:8581"
+      expose:
+        - "8581"
+      volumes:
+        - ./homebridge/var/lib/homebridge:/homebridge:rw
+      proxied: true
+
     uptime:
       container_name: uptime
       image: louislam/uptime-kuma:beta
@@ -35,6 +73,59 @@ docker_host_runner:
         - kibana
       proxied: true
 
+    plex:
+      container_name: plex
+      image: lscr.io/linuxserver/plex:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.103"
+      ports:
+        - "32400:32400"
+      expose:
+        - "32400"
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Etc/UTC
+        - VERSION=docker
+      volumes:
+        - ./plexdata/config:/config:rw
+        - ./../data/Videos/TV Shows:/tv:rw
+        - ./../data/Videos/Movies:/movies:rw
+      proxied: true
+
+    transmission:
+      container_name: transmission
+      image: lscr.io/linuxserver/transmission:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.104"
+      ports:
+        - "9091:9091"
+        - "9413:9413"
+        - "9413:9413/udp"
+      expose:
+        - "9091"
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Etc/UTC
+        - USER=darshaner
+        - PASS=2805Darsh@ne
+        - PEERPORT=9413
+      volumes:
+        - ./transmission/:/config:rw
+        - ./../data/Downloads:/downloads:rw
+        - ./../data/Downloads/:/watch:rw
+      proxied: true
+
+### Lab Containers
     grafana:
       container_name: grafana
       image: grafana/grafana:latest
@@ -114,42 +205,24 @@ docker_host_runner:
         - es
       proxied: true
 
-    homebridge:
-      container_name: homebridge
-      image: oznu/homebridge:latest
+    homeassistant:
+      container_name: homeassistant
+      image: "ghcr.io/home-assistant/home-assistant:stable"
       restart: always
-      mem_limit: 1024m
-      mem_reservation: 256M
-      cpus: 0.5
       logging:
         driver: json-file
       networks:
         elastic:
-          ipv4_address: "192.168.0.101"
+          ipv4_address: "192.168.0.125"
       ports:
-        - "8581:8581"
+        - "8123:8123"
       expose:
-        - "8581"
+        - "8123"
       volumes:
-        - ./homebridge/var/lib/homebridge:/homebridge:rw
+        - ./homeassist/:/config:rw
+        - /etc/localtime:/etc/localtime:ro
+      privileged: true
       proxied: true
-
-    afp:
-      container_name: afp
-      image: mushanyoung/netatalk:latest
-      restart: always
-      logging:
-        driver: json-file
-      networks:
-        elastic:
-          ipv4_address: "192.168.0.100"
-      ports: 
-        - "548:548"
-      expose:
-        - "548"
-      environment: ['USER=darshaner','PASSWORD=05Darsh@ne']
-      volumes: ['./afp/afp.conf:/conf/afp.conf', '/data:/data:rw', '/data-ssd:/data-ssd:rw', '/data-ssd2:/data-ssd2:rw', '/timemachine:/timemachine:rw']
-      proxied: false
 
     gitlab:
       container_name: gitlab
@@ -159,11 +232,11 @@ docker_host_runner:
         driver: json-file
       networks:
         elastic:
-          ipv4_address: 192.168.0.126
+          ipv4_address: "192.168.0.126"
       ports:
-        - '80:80'
-        - '443:443'
-        - '22:22'
+        - "80:80"
+        - "443:443"
+        - "22:22"
       expose:
         - "80"
       environment:
@@ -175,78 +248,6 @@ docker_host_runner:
         - ./gitlab/data:/var/opt/gitlab:rw
       proxied: true
     
-    homeassistant:
-      container_name: homeassistant
-      image: "ghcr.io/home-assistant/home-assistant:stable"
-      restart: always
-      logging:
-        driver: json-file
-      networks:
-        elastic:
-          ipv4_address: 192.168.0.125
-      ports:
-        - "8123:8123"
-      expose:
-        - "8123"
-      volumes:
-        - ./homeassist/:/config:rw
-        - /etc/localtime:/etc/localtime:ro
-      privileged: true
-      proxied: true
-
-### Transmission
-    transmission:
-      container_name: transmission
-      image: lscr.io/linuxserver/transmission:latest
-      restart: always
-      logging:
-        driver: json-file
-      networks:
-        elastic:
-          ipv4_address: 192.168.0.127
-      ports:
-        - "9091:9091"
-        - "9413:9413"
-        - "9413:9413/udp"
-      expose:
-        - "9091"
-      environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=Etc/UTC
-        - USER=darshaner
-        - PASS=2805Darsh@ne
-        - PEERPORT=9413
-      volumes:
-        - ./transmission/:/config
-        - ./../data/Downloads:/downloads
-        - ./../data/Downloads/:/watch
-      proxied: true
-
-    plex:
-      container_name: plex
-      image: lscr.io/linuxserver/plex:latest
-      restart: always
-      logging:
-        driver: json-file
-      networks:
-        elastic:
-          ipv4_address: 192.168.0.128
-      ports:
-        - "32400:32400"
-      expose:
-        - "32400"
-      environment:
-        - PUID=1000
-        - PGID=1000
-        - TZ=Etc/UTC
-        - VERSION=docker
-      volumes:
-        - ./plexdata/config:/config
-        - ./../data/Videos/TV Shows:/tv
-        - ./../data/Videos/Movies:/movies
-      proxied: true
-
   networks:
     elastic: 
       driver: macvlan
