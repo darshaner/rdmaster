@@ -1,0 +1,4 @@
+backup_dir: /opt
+remote_name: rdmaster-opt:/rdmasteropt
+backup_script_name: backup_opt.sh
+cron_schedule: "0 0 * * *"
