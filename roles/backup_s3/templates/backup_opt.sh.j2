@@ -10,7 +10,7 @@ do
 done
 
 # Backup files
-for y in docker-compose-gitlab.yml docker-compose-homeassist.yml docker-compose-rdprod-services.yml docker-compose-registry.yml
+for y in docker-compose-rdprod-services.yml docker-compose-registry.yml
 do
     echo "Backing up file $y..." >> rclone.log
     rclone sync {{ backup_dir }}/$y {{ remote_name }}/ --copy-links 2>&1 | tee -a /var/log/rclone.log
