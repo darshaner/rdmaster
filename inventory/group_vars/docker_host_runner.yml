@@ -1,11 +1,4 @@
-
 app: "rdprod-services"
-folder: "opt"
-cf_token: "SiRgv-1dGhN3DiB-10b2Id4CUiYJjpdassoQBtEA"
-cf_zone: "rdprod.org"
-cf_ttl: "60"
-public_ip: "82.66.158.76"
-haproxy_folder: "/etc/haproxy"
 docker_host_runner:
   app: "rdprod-services"
   static_cf_services:
@@ -213,8 +206,8 @@ docker_host_runner:
           ipv4_address: 192.168.0.127
       ports:
         - "9091:9091"
-        - "51413:51413"
-        - "51413:51413/udp"
+        - "9413:9413"
+        - "9413:9413/udp"
       expose:
         - "9091"
       environment:
@@ -223,7 +216,7 @@ docker_host_runner:
         - TZ=Etc/UTC
         - USER=darshaner
         - PASS=2805Darsh@ne
-        - PEERPORT=51413
+        - PEERPORT=9413
       volumes:
         - ./transmission/:/config
         - ./../data/Downloads:/downloads

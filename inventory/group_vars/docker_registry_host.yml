@@ -1,10 +1,4 @@
 app: "registry" 
-folder: "opt"
-cf_token: "SiRgv-1dGhN3DiB-10b2Id4CUiYJjpdassoQBtEA"
-cf_zone: "rdprod.org"
-cf_ttl: "60"
-public_ip: "82.66.158.76"
-haproxy_folder: "/etc/haproxy"
 docker_registry_host:
   app: "registry" 
   static_cf_services:
@@ -17,10 +11,6 @@ docker_registry_host:
   freebox:
     proxied: true
   home:
-    proxied: true
-  plex:
-    proxied: true
-  transmission:
     proxied: true
   services:
     registry:

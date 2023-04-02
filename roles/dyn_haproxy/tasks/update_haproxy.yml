@@ -47,4 +47,10 @@
     msg: "http://{{ item.key }}.rdprod.org:{{ item.value.expose }}/"
   loop: "{{ services | dict2items }}"
 
+#- name: Show container_info
+#  debug:
+#    msg: "{{ container_info.result }}"
+#  loop: "{{ cleaned_docker_names }}"
+
+
 ...
