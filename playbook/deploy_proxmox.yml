@@ -1,0 +1,28 @@
+---
+- name: Install Proxmox
+  hosts: proxmox
+  become: true
+
+  tasks:
+    - name: Add Proxmox VE repository
+      apt_repository:
+        repo: 'deb http://download.proxmox.com/debian/pve {{ ansible_distribution_release }} pve-no-subscription'
+
+    - name: Add Proxmox repository key
+      apt_key:
+        url: 'http://download.proxmox.com/debian/proxmox-ve-release-7.x.gpg'
+
+    - name: Update apt cache
+      apt:
+        update_cache: true
+
+    - name: Install Proxmox packages
+      apt:
+        name: proxmox-ve
+        state: present
+
+    - name: Reboot server
+      reboot:
+        reboot_timeout: 300
+        pre_reboot_delay: 0
+        post_reboot_delay: 30
