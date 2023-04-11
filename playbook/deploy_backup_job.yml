@@ -1,5 +1,5 @@
 - name: Deploy Docker registry on docker_registry_host
-  hosts: rdmaster.local
+  hosts: rdprod01.local
   become: yes
   roles:
     - role: ../roles/backup_s3

@@ -66,7 +66,7 @@ docker_registry_host:
     elastic: 
       driver: macvlan
       driver_opts: 
-        parent: enp5s0
+        parent: "{{ ethernet_interface }}"
       ipam:
         config:
           - subnet: 192.168.0.0/24
