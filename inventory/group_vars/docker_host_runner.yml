@@ -209,16 +209,12 @@ docker_host_runner:
         - PUID=1000
         - PGID=1000
         - TZ=Etc/UTC
-        - PASSWORD=05Darsh@ne
-       # - HASHED_PASSWORD= #optional
-        - SUDO_PASSWORD=05Darsh@ne
-       # - SUDO_PASSWORD_HASH= #optional
+        - PASSWORD=2805Darsh@ne
+        - SUDO_PASSWORD=2805Darsh@ne
         - PROXY_DOMAIN=vscode.rdprod.org
-       # - DEFAULT_WORKSPACE=/git/git_macmini.code-workspace #optional
       volumes:
         - ./vscode/config:/config:rw
         - ./vscode/git:/git:rw
-
       proxied: true
 
   networks:
