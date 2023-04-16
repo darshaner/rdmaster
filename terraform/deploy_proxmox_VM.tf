@@ -4,7 +4,7 @@ resource "proxmox_vm_qemu" "rdmgmt" {
   target_node = "rdmaster"
   iso  = "local:iso/debian-11.6.0-amd64-DVD-1.iso"
   cores      = 2
-  memory     = 4096
+  memory     = 2048
   qemu_os = "l26"
   bios = "seabios"
   boot = "order=scsi0;ide2"
@@ -35,7 +35,7 @@ resource "proxmox_vm_qemu" "rdprod1" {
   target_node = "rdmaster"
   #iso  = "local:iso/debian-11.6.0-amd64-DVD-1.iso"
   cores      = 2
-  memory     = 4096
+  memory     = 2048
   balloon = 2048
   numa = true
   qemu_os = "l26"

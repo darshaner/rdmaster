@@ -1,47 +1,46 @@
 ---
 
-#- name: Install Docker on docker_registry_host
-#  hosts: docker_registry_host
-#  become: yes
-#  roles:
-#    - ../roles/docker_install
-
-- name: Deploy Docker registry on docker_registry_host
-  hosts: docker_registry_host
+- name: Deploy Docker Compose with custom image on mgmt_node
+  hosts: mgmt_node
   become: yes
   roles:
-    - role: ../roles/docker_compose_deploy
+    - ../roles/docker_compose_deploy
   vars:
-    app: "{{ docker_registry_host.app }}"
-    services: "{{ docker_registry_host.services }}"
-    networks: "{{ docker_registry_host.networks }}"
-    volumes: "{{ docker_registry_host.volumes }}"
+    app: "{{ mgmt_node.app }}"
+    services: "{{ mgmt_node.services }}"
+    networks: "{{ mgmt_node.networks }}"
+    volumes: "{{ mgmt_node.volumes }}"
 
-- name: Update HAProxy on haproxy_host
-  hosts: docker_host_runner 
+- name: Update HAProxy on haproxy_host for mgmt_node
+  hosts: mgmt_node 
   become: yes
   roles:
     - ../roles/dyn_haproxy
   vars:
-    services: "{{ docker_registry_host.services }}"
-    networks: "{{ docker_registry_host.networks }}"
-    volumes: "{{ docker_registry_host.volumes }}"
+    services: "{{ mgmt_node.services }}"
+    networks: "{{ mgmt_node.networks }}"
+    volumes: "{{ mgmt_node.volumes }}"
+    app: "{{ mgmt_node.app }}"
 
-- name: Provision Cloudflare for Docker registry 
-  hosts: docker_registry_host
+- name: Provision Cloudflare for Docker services for mgmt_node 
+  hosts: mgmt_node 
   become: yes
   gather_facts: no
   roles:
     - role: ../roles/cloudflare
   vars:
-    services: "{{ docker_registry_host.services }}"
-    networks: "{{ docker_registry_host.networks }}"
-    volumes: "{{ docker_registry_host.volumes }}"
+    services: "{{ mgmt_node.services }}"
+    networks: "{{ mgmt_node.networks }}"
+    volumes: "{{ mgmt_node.volumes }}"
 
-#- name: Build custom Docker image on docker_builder
-#  hosts: docker_builder
-#  roles:
-#    - ../roles/docker_build
+- name: Provision Cloudflare for Static services for mgmt_node
+  hosts: mgmt_node 
+  become: yes
+  gather_facts: no
+  roles:
+    - role: ../roles/cloudflare
+  vars:
+    services: "{{ mgmt_node.static_cf_services }}"
 
 - name: Deploy Docker Compose with custom image on docker_host
   hosts: docker_host_runner
@@ -54,7 +53,7 @@
     networks: "{{ docker_host_runner.networks }}"
     volumes: "{{ docker_host_runner.volumes }}"
 
-- name: Update HAProxy on haproxy_host
+- name: Update HAProxy on haproxy_host for docker_host
   hosts: docker_host_runner 
   become: yes
   roles:
@@ -63,8 +62,9 @@
     services: "{{ docker_host_runner.services }}"
     networks: "{{ docker_host_runner.networks }}"
     volumes: "{{ docker_host_runner.volumes }}"
+    app: "{{ docker_host_runner.app }}"
 
-- name: Provision Cloudflare for Docker services 
+- name: Provision Cloudflare for Docker services for docker_host 
   hosts: docker_host_runner 
   become: yes
   gather_facts: no
@@ -75,7 +75,7 @@
     networks: "{{ docker_host_runner.networks }}"
     volumes: "{{ docker_host_runner.volumes }}"
 
-- name: Provision Cloudflare for Static services 
+- name: Provision Cloudflare for Static services for docker_host 
   hosts: docker_host_runner 
   become: yes
   gather_facts: no

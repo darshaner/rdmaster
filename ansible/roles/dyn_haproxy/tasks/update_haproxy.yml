@@ -13,24 +13,24 @@
   register: container_info
   loop: "{{ cleaned_docker_names }}"
 
-- name: Generate index.http
-  template:
-    src: index.http.j2
-    dest: "{{ haproxy_folder }}/index.http"
-  register: index_http_result
-  delegate_to: haproxy.local
+#- name: Generate index.http
+#  template:
+#    src: index.http.j2
+#    dest: "{{ haproxy_folder }}/index.http"
+#  register: index_http_result
+#  delegate_to: haproxy.local
 
-- name: Backup Haproxy Config
-  ansible.builtin.command:
-    cmd: cp {{ haproxy_folder }}/haproxy.cfg {{ haproxy_folder }}/haproxy.cfg.backup
-  register: haproxy_backup_result
-  #when: index_http_result.changed
-  delegate_to: haproxy.local
+#- name: Backup Haproxy Config
+#  ansible.builtin.command:
+#    cmd: cp {{ haproxy_folder }}/haproxy-{{ app }}.cfg {{ haproxy_folder }}/haproxy-{{ app }}.cfg.backup
+#  register: haproxy_backup_result
+#  #when: index_http_result.changed
+#  delegate_to: haproxy.local
 
 - name: Generate haproxy.conf
   template:
     src: haproxy.conf.j2
-    dest: "{{ haproxy_folder }}/haproxy.cfg"
+    dest: "{{ haproxy_folder }}/haproxy-{{ app }}.cfg"
   register: haproxy_config_result
   #when: haproxy_backup_result.changed
   delegate_to: haproxy.local
