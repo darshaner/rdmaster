@@ -1,0 +1,13 @@
+---
+- name: Deploy docker-compose file
+  ansible.builtin.template:
+    src: "docker-compose.yml.j2"
+    dest: "/{{ folder }}/docker-compose-{{ app }}.yml"
+    mode: '0644'
+
+- name: Start Docker Compose services
+  ansible.builtin.shell: "docker-compose -f /{{ folder }}/docker-compose-{{ app }}.yml up -d"
+  args:
+    chdir: "/{{ folder }}/"
+
+...

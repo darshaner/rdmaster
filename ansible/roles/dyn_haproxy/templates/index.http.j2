@@ -1,0 +1,23 @@
+HTTP/1.0 200 Found
+Cache-Control: no-cache
+Connection: close
+Content-Type: text/html
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<title> RDPROD Home Page </title>
+<meta charset="UTF-8">
+</head>
+
+<body>
+{% for container in container_info.results %}
+  {% set container_name = container.container.Name | regex_replace('^/', '') %}
+
+<p><a href="http://{{ container_name}}.rdprod.org">{{ container_name }}</a></p>
+{% endfor %}
+<p><a href="http://freebox.rdprod.org">Freebox</a></p>
+
+</body> 
+</html>

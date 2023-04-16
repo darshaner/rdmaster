@@ -1,0 +1,43 @@
+---
+
+
+- name: Deploy Docker Compose with custom image on docker_host
+  hosts: docker_host_runner_lab
+  become: yes
+  roles:
+    - ../roles/docker_compose_deploy
+  vars:
+    app: "{{ docker_host_runner_lab.app }}"
+    services: "{{ docker_host_runner_lab.services }}"
+    networks: "{{ docker_host_runner_lab.networks }}"
+    volumes: "{{ docker_host_runner_lab.volumes }}"
+
+- name: Update HAProxy on haproxy_host
+  hosts: docker_host_runner_lab 
+  become: yes
+  roles:
+    - ../roles/dyn_haproxy
+  vars:
+    services: "{{ docker_host_runner_lab.services }}"
+    networks: "{{ docker_host_runner_lab.networks }}"
+    volumes: "{{ docker_host_runner_lab.volumes }}"
+
+- name: Provision Cloudflare for Docker services 
+  hosts: docker_host_runner_lab 
+  become: yes
+  gather_facts: no
+  roles:
+    - role: ../roles/cloudflare
+  vars:
+    services: "{{ docker_host_runner_lab.services }}"
+    networks: "{{ docker_host_runner_lab.networks }}"
+    volumes: "{{ docker_host_runner_lab.volumes }}"
+
+- name: Provision Cloudflare for Static services 
+  hosts: docker_host_runner_lab 
+  become: yes
+  gather_facts: no
+  roles:
+    - role: ../roles/cloudflare
+  vars:
+    services: "{{ docker_host_runner_lab.static_cf_services }}"

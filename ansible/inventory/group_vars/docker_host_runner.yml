@@ -1,0 +1,167 @@
+app: "rdprod-services"
+docker_host_runner:
+  app: "rdprod-services"
+  static_cf_services:
+    rdprod01:
+      proxied: false
+  services:
+### Production Containers
+
+    homebridge:
+      container_name: homebridge
+      hostname: homebridge
+      image: oznu/homebridge:latest
+      restart: always
+      mem_limit: 1024m
+      mem_reservation: 256M
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.101"
+      ports:
+        - "8581:8581"
+      expose:
+        - "8581"
+      volumes:
+        - ./homebridge/var/lib/homebridge:/homebridge:rw
+      proxied: true
+
+    plex:
+      container_name: plex
+      hostname: plex
+      image: lscr.io/linuxserver/plex:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.103"
+      ports:
+        - "32400:32400"
+      expose:
+        - "32400"
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Etc/UTC
+        - VERSION=docker
+      volumes:
+        - ./plexdata/config:/config:rw
+        - ./../data/Videos/TV Shows:/tv:rw
+        - ./../data/Videos/Movies:/movies:rw
+      proxied: true
+
+    transmission:
+      container_name: transmission
+      hostname: transmission
+      image: lscr.io/linuxserver/transmission:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.104"
+      ports:
+        - "9091:9091"
+        - "9413:9413"
+        - "9413:9413/udp"
+      expose:
+        - "9091"
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Etc/UTC
+        - USER=darshaner
+        - PASS=2805Darsh@ne
+        - PEERPORT=9413
+      volumes:
+        - ./transmission/:/config:rw
+        - ./../data/Downloads:/downloads:rw
+        - ./../data/Downloads/:/watch:rw
+      proxied: true
+    
+    sonarr:
+      container_name: sonarr
+      hostname: sonarr
+      image: lscr.io/linuxserver/sonarr:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.105"
+      ports:
+        - "8989:8989"
+      expose:
+        - "8989"
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Etc/UTC
+      volumes:
+        - "/data/Downloads:/downloads:rw"
+        - "/data/Videos/TV Shows:/tv:rw"
+        - "./sonarr/config:/config:rw"
+        - "/data/Downloads:/downloads/series:rw"
+      proxied: true
+
+    radarr:
+      container_name: radarr
+      hostname: radarr
+      image: lscr.io/linuxserver/radarr:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.106"
+      ports:
+        - "7878:7878"
+      expose:
+        - "7878"
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Etc/UTC
+      volumes:
+        - "./radarr/config:/config"
+        - "/data/Videos/Movies:/movies"
+        - "/data/Downloads:/downloads:rw"
+      proxied: true
+
+    prowlarr:
+      container_name: prowlarr
+      hostname: prowlarr
+      image: lscr.io/linuxserver/prowlarr:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic: 
+          ipv4_address: "192.168.0.107"
+      ports:
+        - "9696:9696"
+      expose:
+        - "9696"
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Etc/UTC
+      volumes:
+        - ./prowlarr:/config
+      proxied: true
+
+  networks:
+    elastic: 
+      driver: macvlan
+      driver_opts: 
+        parent: "{{ ethernet_interface }}"
+      ipam:
+        config:
+          - subnet: 192.168.0.0/24
+            gateway: 192.168.0.254
+
+  volumes:
+    uptime-kuma:
+      driver: local

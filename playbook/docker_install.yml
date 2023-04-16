@@ -1,9 +1,0 @@
----
-- name: Playbook to install Docker
-  hosts: all
-  become: true
-  gather_facts: no
-  roles:
-    - ../roles/docker_install
-
-...

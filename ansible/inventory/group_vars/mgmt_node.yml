@@ -1,0 +1,85 @@
+app: "rdmgmt"
+mgmt_node:
+  app: "rdmgmt"
+  static_cf_services:
+    rdmgmt:
+      proxied: false
+  services:
+### Production Containers
+    afp:
+      container_name: afp
+      hostname: afp
+      image: mushanyoung/netatalk:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.100"
+      ports: 
+        - "548:548"
+      expose:
+        - "548"
+      environment: ['USER=darshaner','PASSWORD=05Darsh@ne']
+      volumes: ['./afp/afp.conf:/conf/afp.conf',  '/data-ssd:/data-ssd:rw', '/data-ssd2:/data-ssd2:rw', '/timemachine:/timemachine:rw']
+      proxied: false
+
+    uptime:
+      container_name: uptime
+      hostname: uptime
+      image: louislam/uptime-kuma:beta
+      restart: always
+      mem_limit: 1024m
+      mem_reservation: 256M
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.102"
+      ports:
+        - "3001:3001"
+      expose:
+        - "3001"
+      volumes:
+        - ./uptime-kuma:/app/data:rw
+      proxied: true
+
+    vscode:
+      container_name: vscode
+      hostname: vscode
+      image: lscr.io/linuxserver/code-server:latest
+      restart: always
+      logging:
+        driver: json-file
+      networks:
+        elastic:
+          ipv4_address: "192.168.0.128"
+      ports:
+        - "8443:8443"
+      expose:
+        - "8443"
+      environment:
+        - PUID=1000
+        - PGID=1000
+        - TZ=Etc/UTC
+        - PASSWORD=2805Darsh@ne
+        - SUDO_PASSWORD=2805Darsh@ne
+        - PROXY_DOMAIN=vscode.rdprod.org
+      volumes:
+        - ./vscode/config:/config:rw
+        - ./vscode/git:/git:rw
+      proxied: true
+
+  networks:
+    elastic: 
+      driver: macvlan
+      driver_opts: 
+        parent: "{{ ethernet_interface }}"
+      ipam:
+        config:
+          - subnet: 192.168.0.0/24
+            gateway: 192.168.0.254
+
+  volumes:
+    uptime-kuma:
+      driver: local

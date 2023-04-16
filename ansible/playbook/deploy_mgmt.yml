@@ -1,0 +1,48 @@
+---
+
+#- name: Install Docker on docker_registry_host
+#  hosts: mgmt_node
+#  become: yes
+#  roles:
+#    - ../roles/docker_install
+
+- name: Deploy Docker Compose with custom image on docker_host
+  hosts: mgmt_node
+  become: yes
+  roles:
+    - ../roles/docker_compose_deploy
+  vars:
+    app: "{{ mgmt_node.app }}"
+    services: "{{ mgmt_node.services }}"
+    networks: "{{ mgmt_node.networks }}"
+    volumes: "{{ mgmt_node.volumes }}"
+
+- name: Update HAProxy on haproxy_host
+  hosts: mgmt_node 
+  become: yes
+  roles:
+    - ../roles/dyn_haproxy
+  vars:
+    services: "{{ mgmt_node.services }}"
+    networks: "{{ mgmt_node.networks }}"
+    volumes: "{{ mgmt_node.volumes }}"
+
+- name: Provision Cloudflare for Docker services 
+  hosts: mgmt_node 
+  become: yes
+  gather_facts: no
+  roles:
+    - role: ../roles/cloudflare
+  vars:
+    services: "{{ mgmt_node.services }}"
+    networks: "{{ mgmt_node.networks }}"
+    volumes: "{{ mgmt_node.volumes }}"
+
+- name: Provision Cloudflare for Static services 
+  hosts: mgmt_node 
+  become: yes
+  gather_facts: no
+  roles:
+    - role: ../roles/cloudflare
+  vars:
+    services: "{{ mgmt_node.static_cf_services }}"

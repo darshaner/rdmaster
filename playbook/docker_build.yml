@@ -1,9 +1,0 @@
----
-- name: Playbook to build Docker Images
-  hosts: docker_builder
-  become: true
-  gather_facts: no
-  roles:
-    - ../roles/docker_build
-
-...

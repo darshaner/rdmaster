@@ -1,0 +1,9 @@
+---
+- name: Playbook to create and deploy docker-compose file
+  hosts: docker_host_runner , docker_registry_host
+  become: yes
+  gather_facts: no
+  roles:
+    - ../roles/docker_compose_deploy
+
+...
