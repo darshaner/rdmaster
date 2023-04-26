@@ -3,10 +3,30 @@ remote_name: rdmaster-opt:/rdmasteropt
 backup_script_name: backup_opt.sh
 cron_schedule: "0 0 * * *"
 folder: "opt"
-cf_token: "SiRgv-1dGhN3DiB-10b2Id4CUiYJjpdassoQBtEA"
+cf_token: "{{ vault_cf_token }}"
 cf_zone: "rdprod.org"
 cf_ttl: "60"
 public_ip: "82.66.158.76"
 haproxy_folder: "/etc/haproxy"
 ethernet_interface: ens18
 ansible_connection: paramiko
+
+nfs_mounts:
+  - { mount_path: "/timemachine", nfs_server: "rdmaster.local" } 
+  - { mount_path: "/data-ssd" , nfs_server: "rdmaster.local" } 
+  - { mount_path: "/rdprod" , nfs_server: "rdmaster.local" } 
+  - { mount_path: "/opt" , nfs_server: "rdmaster.local" } 
+
+etc_hosts:
+  - { ip: "192.168.0.13" ,hostname: "rdmaster.local rdmaster" }
+  - { ip: "192.168.0.6" ,hostname: "rdprod01.local rdprod01" }
+  - { ip: "192.168.0.7" ,hostname: "rdprod02.local rdprod02" }
+  - { ip: "192.168.0.8" ,hostname: "rdprod03.local rdprod03" }
+  - { ip: "192.168.0.31" ,hostname: "rdlab01.local rdlab01" }
+  - { ip: "192.168.0.32" ,hostname: "rdlab02.local rdlab02" }
+  - { ip: "192.168.0.33" ,hostname: "rdlab03.local rdlab03" }
+  - { ip: "192.168.0.11" ,hostname: "rdswitch.local rdswitch" }
+  - { ip: "192.168.0.12" ,hostname: "haproxy.local haproxy" }
+  - { ip: "192.168.0.14" ,hostname: "macbook-wifi.local" }
+  - { ip: "192.168.0.15" ,hostname: "macbook.local" }
+  - { ip: "192.168.0.16" ,hostname: "rf.local" }

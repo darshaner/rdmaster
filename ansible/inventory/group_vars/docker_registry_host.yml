@@ -30,7 +30,7 @@ docker_registry_host:
       environment:
         REGISTRY_STORAGE_DELETE_ENABLED: "'true'"
         REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /data
-        REGISTRY_HTTP_SECRET: "05Darsh@ne"
+        REGISTRY_HTTP_SECRET: "{{ vault_registry_password }}"
         REGISTRY_AUTH: htpasswd
         REGISTRY_AUTH_HTPASSWD_REALM: Registry
         REGISTRY_AUTH_HTPASSWD_PATH: /auth/registry.password

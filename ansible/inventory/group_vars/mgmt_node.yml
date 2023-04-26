@@ -20,8 +20,8 @@ mgmt_node:
         - "548:548"
       expose:
         - "548"
-      environment: ['USER=darshaner','PASSWORD=05Darsh@ne']
-      volumes: ['./afp/afp.conf:/conf/afp.conf',  '/data-ssd:/data-ssd:rw', '/data-ssd2:/data-ssd2:rw', '/timemachine:/timemachine:rw']
+      environment: ['USER=darshaner','PASSWORD={{ vault_afp_password }}', 'PUID=1000', 'PGID=1000']
+      volumes: ['./afp/afp.conf:/conf/afp.conf',  '/data-ssd:/data-ssd:rw', '/rdprod:/rdprod:rw', '/timemachine:/timemachine:rw', '/opt:/opt:rw']
       proxied: false
 
     uptime:
@@ -40,6 +40,7 @@ mgmt_node:
         - "3001:3001"
       expose:
         - "3001"
+      environment: ['PUID=1000', 'PGID=1000']
       volumes:
         - ./uptime-kuma:/app/data:rw
       proxied: true
@@ -62,8 +63,8 @@ mgmt_node:
         - PUID=1000
         - PGID=1000
         - TZ=Etc/UTC
-        - PASSWORD=2805Darsh@ne
-        - SUDO_PASSWORD=2805Darsh@ne
+        - PASSWORD="{{ vault_vscode_password }}"
+        - SUDO_PASSWORD="{{ vault_vscode_sudo_password }}"
         - PROXY_DOMAIN=vscode.rdprod.org
       volumes:
         - ./vscode/config:/config:rw
@@ -79,7 +80,6 @@ mgmt_node:
         config:
           - subnet: 192.168.0.0/24
             gateway: 192.168.0.254
-
   volumes:
     uptime-kuma:
       driver: local

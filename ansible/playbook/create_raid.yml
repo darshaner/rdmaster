@@ -1,0 +1,14 @@
+- name: Get UUID to device mapping
+  ansible.builtin.shell: "blkid | grep '{{ item }}'"
+  register: uuid_device_mapping
+  loop:
+    - "{{ raid_config.UUID1 }}"
+    - "{{ raid_config.UUID2 }}"
+
+- name: Extract device names from output
+  ansible.builtin.set_fact:
+    devices: "{{ uuid_device_mapping.results | items2dict(key_name='item', value_name='stdout') | dict2items | map(attribute='value') | map('regex_replace', '^.*: (/dev/[^:]+):.*$', '\\1') | list }}"
+
+- name: Create RAID array
+  ansible.builtin.shell: mdadm --create --verbose {{ raid_config.md_device }} --level={{ raid_config.raid_level }} --raid-devices=2 {{ devices | join(' ') }}
+  ignore_errors: true

@@ -3,9 +3,23 @@ remote_name: rdmaster-opt:/rdmasteropt
 backup_script_name: backup_opt.sh
 cron_schedule: "0 0 * * *"
 folder: "opt"
-cf_token: "SiRgv-1dGhN3DiB-10b2Id4CUiYJjpdassoQBtEA"
+cf_token: "{{ vault_cf_token }}"
 cf_zone: "rdprod.org"
 cf_ttl: "60"
 public_ip: "82.66.158.76"
 haproxy_folder: "/etc/haproxy"
-ansible_connection: paramiko
+#ansible_connection: paramiko
+
+##### Raid (mdam)
+raid_points:
+  - { md_device: "/dev/md1" , raid_level: "1" , mount_path: "/data", UUID1: "1de525fc-039c-2e86-78cf-e672c6af17da", UUID2: "bafacf0b-951b-29fb-7c64-cce4c72b22a5" }
+  - { md_device: "/dev/md127" , raid_level: "1" , mount_path: "/data-ssd", UUID1: "c3296bf0-b946-7ead-12d7-7284a359be6a", UUID2: "4d0692e3-3719-6bdc-e3e6-f0748b37db3a" }
+  - { md_device: "/dev/md2" , raid_level: "1" , mount_path: "/rdprod", UUID1: "6f077d05-2b89-3842-6880-4f55db8d85a4", UUID2: "57178302-263c-156c-d164-1307aba60bf8" }
+
+##### FSTab
+mount_points:
+  - { mount_path: "/opt" , id: 'UUID="d27203f2-2778-44e7-8bf5-e61ba5ecf9c8"', filesystem: "ext4" , option: "rw,relatime 0 0", client: "192.168.0.0/24(rw,all_squash,anonuid=1000,anongid=1000,sync,no_subtree_check)"}
+  - { mount_path: "/timemachine" , id: 'UUID="e754dfff-686f-408b-a02c-a2073b245a59"', filesystem: "ext4" , option: "rw,relatime 0 0", client: "192.168.0.0/24(rw,all_squash,anonuid=1000,anongid=1000,sync,no_subtree_check)"}
+  - { mount_path: "/data" , id: "/dev/md1", filesystem: "ext4" , option: "errors=remount-ro 0 0", client: "192.168.0.0/24(rw,all_squash,anonuid=1000,anongid=1000,sync,no_subtree_check)"}
+  - { mount_path: "/data-ssd" , id: "/dev/md127", filesystem: "ext4" , option: "rw,relatime 0 0", client: "192.168.0.0/24(rw,all_squash,anonuid=1000,anongid=1000,sync,no_subtree_check)"}
+  - { mount_path: "/rdprod" , id: "/dev/md0p1", filesystem: "ext4" , option: "rw,relatime 0 0", client: "192.168.0.0/24(rw,all_squash,anonuid=1000,anongid=1000,sync,no_subtree_check)"}

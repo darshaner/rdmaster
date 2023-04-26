@@ -23,6 +23,9 @@ docker_host_runner:
         - "8581:8581"
       expose:
         - "8581"
+      environment:
+        - PUID=1000
+        - PGID=1000
       volumes:
         - ./homebridge/var/lib/homebridge:/homebridge:rw
       proxied: true
@@ -48,8 +51,8 @@ docker_host_runner:
         - VERSION=docker
       volumes:
         - ./plexdata/config:/config:rw
-        - ./../data/Videos/TV Shows:/tv:rw
-        - ./../data/Videos/Movies:/movies:rw
+        - ./../data/Medias/TV:/tv:rw
+        - ./../data/Medias/Movies:/movies:rw
       proxied: true
 
     transmission:
@@ -73,12 +76,11 @@ docker_host_runner:
         - PGID=1000
         - TZ=Etc/UTC
         - USER=darshaner
-        - PASS=2805Darsh@ne
+        - PASS="{{ vault_transmission_password }}"
         - PEERPORT=9413
       volumes:
         - ./transmission/:/config:rw
-        - ./../data/Downloads:/downloads:rw
-        - ./../data/Downloads/:/watch:rw
+        - ./../data/Medias:/downloads:rw
       proxied: true
     
     sonarr:
@@ -101,9 +103,9 @@ docker_host_runner:
         - TZ=Etc/UTC
       volumes:
         - "/data/Downloads:/downloads:rw"
-        - "/data/Videos/TV Shows:/tv:rw"
+        - "/data/Medias/TV:/tv:rw"
         - "./sonarr/config:/config:rw"
-        - "/data/Downloads:/downloads/series:rw"
+        - "/data/Medias:/downloads/series:rw"
       proxied: true
 
     radarr:
@@ -126,8 +128,8 @@ docker_host_runner:
         - TZ=Etc/UTC
       volumes:
         - "./radarr/config:/config"
-        - "/data/Videos/Movies:/movies"
-        - "/data/Downloads:/downloads:rw"
+        - "/data/Medias/Movies:/movies"
+        - "/data/Medias:/downloads/movies:rw"
       proxied: true
 
     prowlarr:
@@ -163,5 +165,5 @@ docker_host_runner:
             gateway: 192.168.0.254
 
   volumes:
-    uptime-kuma:
+    homebridge:
       driver: local

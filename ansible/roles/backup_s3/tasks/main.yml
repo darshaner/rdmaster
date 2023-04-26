@@ -6,7 +6,7 @@
 
 # Configure Rclone
 - name: Create Rclone config
-  command: rclone config create rdmaster-opt s3 provider "Scaleway" env_auth "false" access_key_id "SCW0G4ZQ77S4RCYB30NZ" secret_access_key "5d1ddb60-0d8c-4835-a62f-58e007e3b299" region "fr-par" endpoint "s3.fr-par.scw.cloud" acl "private" storage_class "GLACIER"
+  command: rclone config create rdmaster-opt s3 provider "Scaleway" env_auth "false" access_key_id "{{ scaleway_key_id }}" secret_access_key "{{ vault_scaleway_access_key }}" region "fr-par" endpoint "s3.fr-par.scw.cloud" acl "private" storage_class "GLACIER"
 
 # Create backup script
 - name: Create backup script

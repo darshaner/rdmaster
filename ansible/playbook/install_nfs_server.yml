@@ -1,0 +1,60 @@
+---
+- name: Montage des disques
+  hosts: rdmaster.local
+  become: true
+  vars:
+  tasks:
+  - name: Configuration du RAID
+    include_tasks: create_raid.yml
+    loop_control:
+      loop_var: raid_config
+    loop: "{{ raid_points }}"
+
+  - name: Création des points de montage
+    file:
+      path: "{{ item.mount_path }}"
+      state: directory
+      mode: '0777'
+      owner: nobody
+      group: nogroup
+    with_items:
+      - "{{ mount_points }}"
+
+  - name: Ajout des UUID aux fichiers fstab
+    lineinfile:
+      path: /etc/fstab
+      line: "{{ item.id }} {{ item.mount_path }} {{ item.filesystem }} {{ item.option }}"
+      state: present
+    loop: "{{ mount_points }}"
+
+  - name: Montage des disques
+    mount:
+      path: "{{ item.mount_path }}"
+      src: "{{ item.id }}"
+      fstype: ext4
+      opts: defaults
+      state: mounted
+    with_items:
+      - "{{ mount_points }}"
+
+  - name: Installation des paquets NFS
+    apt:
+      name:
+        - nfs-kernel-server
+        - nfs-common
+      state: present
+
+  - name: Configuration des exports NFS
+    lineinfile:
+      path: /etc/exports
+      line: "{{ item.mount_path }} {{ item.client }}"
+      state: present
+    with_items:
+      - "{{ mount_points }}"
+
+  - name: Redémarrage du service NFS
+    systemd:
+      name: nfs-kernel-server
+      state: restarted
+
+...

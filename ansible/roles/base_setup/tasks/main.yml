@@ -1,0 +1,80 @@
+---
+- name: Copy ssh keys 
+  block:
+    - name: Create directory if it doesn't exist
+      become: no
+      file:
+        path: ~/.ssh
+        state: directory
+        mode: '0700'
+        
+    - name: Add authorized key
+      become: no
+      authorized_key:
+        user: "{{ ansible_user }}"
+        key: "{{ lookup('file', '/Users/darshaner/.ssh/id_rsa.pub') }}"
+
+    - name: Add user to sudoers file
+      become: yes
+      community.general.sudoers:
+        name: darshaner
+        state: present
+        nopassword: true
+        group: ALL
+        commands: ALL
+
+- name: Add hosts to /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ item.ip }} {{ item.hostname }}"
+  with_items: "{{ etc_hosts }}"
+
+- name: Install Basic Packages
+  block:
+  - name: Replace sources.list file
+    copy:
+      src: "{{ role_path }}/files/sources.list"
+      dest: /etc/apt/sources.list
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: Update the apt-get package index
+    apt:
+      update_cache: yes
+
+  - name: Install Packages
+    apt:
+      name: "{{ packages }}"
+    vars:
+      packages:
+        - vim
+        - git 
+        - net-tools
+        - openssh-client 
+        - curl
+        - python3.9
+        - python3-pip
+
+- name: mount NFS
+  block:
+  - name: Installation des paquets NFS
+    apt:
+      name:
+        - nfs-common
+      state: present
+
+  - name: Création des points de montage
+    file:
+      path: "{{ item.mount_path }}"
+      state: directory
+    with_items: "{{ nfs_mounts }}"
+
+  - name: Montage des disques NFS
+    mount:
+      path: "{{ item.mount_path }}"
+      src: "{{ item.nfs_server }}:{{ item.mount_path }}"
+      fstype: nfs
+      opts: defaults
+      state: mounted
+    with_items: "{{ nfs_mounts }}"
